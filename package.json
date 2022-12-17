@@ -1,0 +1,12 @@
+{
+  "name": "encodify",
+  "version": "1.0.0",
+  "description": "Encode files and keep the dates correct",
+  "main": "scripts/encode.js",
+  "author": "Riley Hilliard",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "yargs": "^17.5.1"
+  }
+}
