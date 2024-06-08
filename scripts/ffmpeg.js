@@ -1,18 +1,10 @@
 #!/usr/bin/env node
 const fs = require("fs");
 const { spawn } = require("child_process");
-const util = require("node:util");
-const exec = util.promisify(require("node:child_process").exec);
+const { changeDate } = require("./change-date");
 
 const argv = require("yargs/yargs")(process.argv.slice(2)).argv;
 const folder = argv.f;
-
-function changeDate(root, file) {
-  const movVersion = file.replace(".MP4", ".mov");
-  return exec(
-    `exiftool -tagsFromFile '${root}/${file}' '${root}/${movVersion}'`
-  );
-}
 
 function encodeFile(file) {
   return new Promise((resolve, reject) => {
