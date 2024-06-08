@@ -53,6 +53,9 @@ function encodeFile(file) {
 }
 
 async function encode() {
+  console.warn(
+    "HUGE warning, the quality on this might be low. For higher quality try encode.js."
+  );
   try {
     const files = fs.readdirSync(folder);
     const tasks = files.map((file) => () => encodeFile(file));
