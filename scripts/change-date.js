@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 const util = require("node:util");
+const fs = require("node:fs");
+const { spawn } = require("child_process");
+
 const exec = util.promisify(require("node:child_process").exec);
 
 function changeDate(root, file) {
