@@ -1,18 +1,41 @@
 {
   "name": "encodify",
   "version": "1.0.0",
-  "description": "Encode files and keep the dates correct",
-  "main": "scripts/encode.js",
+  "description": "Encode video files and preserve original creation dates",
+  "main": "scripts/ffmpeg.js",
+  "scripts": {
+    "start": "node scripts/ffmpeg.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rileyhilliard/encodify.git"
+  },
+  "keywords": [
+    "video",
+    "encoding",
+    "ffmpeg",
+    "metadata",
+    "creation-date"
+  ],
   "author": "Riley Hilliard",
   "license": "MIT",
-  "private": true,
-  "devDependencies": {
-    "yargs": "^17.7.2"
+  "bugs": {
+    "url": "https://github.com/rileyhilliard/encodify/issues"
   },
+  "homepage": "https://github.com/rileyhilliard/encodify#readme",
   "dependencies": {
     "ffprobe": "^1.1.2",
     "multi-progress": "^4.0.0",
-    "progress": "^2.0.3",
-    "winston": "^3.13.0"
-  }
+    "winston": "^3.13.0",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.4.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "private": true
 }
