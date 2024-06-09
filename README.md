@@ -1,4 +1,4 @@
-# Encode and Change Date
+# Transcode mp4 videos to x265 and retain video metadata 
 
 This project provides a script to encode all `.MP4` files in a specified folder to HVEC (H.265) format and change the creation date of the encoded files to match the creation date of the original `.MP4` files.
 
