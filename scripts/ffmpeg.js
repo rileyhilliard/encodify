@@ -1,32 +1,71 @@
 #!/usr/bin/env node
 const fs = require("fs");
+const path = require("path");
 const { spawn, spawnSync } = require("child_process");
 const { changeDate } = require("./change-date");
-const argv = require("yargs/yargs")(process.argv.slice(2)).argv;
-const folder = argv.f;
+const yargs = require("yargs/yargs");
+const { hideBin } = require("yargs/helpers");
 const MultiProgress = require("multi-progress");
+const winston = require("winston");
 
-function encodeFile(file, index, progress) {
-  return new Promise((resolve, reject) => {
+const logger = winston.createLogger({
+  level: "info",
+  format: winston.format.json(),
+  defaultMeta: { service: "encode-service" },
+  transports: [
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
+});
+
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
+}
+
+const argv = yargs(hideBin(process.argv)).option("folder", {
+  alias: "f",
+  describe: "Folder path",
+  demandOption: true,
+  type: "string",
+}).argv;
+
+const folder = argv.folder;
+
+async function encodeFile(file, index, progress) {
+  try {
     if (!file.includes(".MP4")) {
-      resolve();
       return;
     }
 
-    const dest = `${folder}/${file.replace("MP4", "mov")}`;
+    const lastIndex = file.lastIndexOf(".");
+    const name = file.substring(0, lastIndex);
+    const dest = path.join(folder, `${name}-encoded.mp4`);
 
-    // Check if the destination file already exists
     if (fs.existsSync(dest)) {
-      console.warn(`Skipping encoding for ${file} as ${dest} already exists.`);
-      resolve();
+      logger.warn(`Skipping encoding for ${file} as ${dest} already exists.`);
       return;
     }
+
+    const ffprobe = spawnSync("ffprobe", [
+      "-v",
+      "quiet",
+      "-show_entries",
+      "format=duration",
+      "-of",
+      "default=noprint_wrappers=1:nokey=1",
+      path.join(folder, file),
+    ]);
+    const duration = parseFloat(ffprobe.stdout.toString());
 
     const process = spawn(
       "ffmpeg",
       [
         "-i",
-        `${folder}/${file}`,
+        path.join(folder, file),
         "-c:v",
         "libx265",
         "-preset",
@@ -45,17 +84,6 @@ function encodeFile(file, index, progress) {
       ],
       { stdio: ["ignore", "pipe", "pipe"] }
     );
-
-    const ffprobe = spawnSync("ffprobe", [
-      "-v",
-      "quiet",
-      "-show_entries",
-      "format=duration",
-      "-of",
-      "default=noprint_wrappers=1:nokey=1",
-      `${folder}/${file}`,
-    ]);
-    const duration = parseFloat(ffprobe.stdout.toString());
 
     const bar = progress.newBar(`[:bar] ${file} :percent | ETA: :etas`, {
       complete: "=",
@@ -79,17 +107,24 @@ function encodeFile(file, index, progress) {
       }
     });
 
-    process.on("close", async (code) => {
-      if (code === 0) {
-        bar.update(1);
-        await changeDate(folder, file);
-        resolve();
-      } else {
-        console.error(`Encoding failed for ${file} with exit code ${code}`);
-        resolve();
-      }
+    await new Promise((resolve, reject) => {
+      process.on("close", async (code) => {
+        if (code === 0) {
+          bar.update(1);
+
+          await changeDate(path.join(folder, file), dest);
+          resolve();
+        } else {
+          const errorMessage = `Encoding failed for ${file} with exit code ${code}`;
+          logger.error(errorMessage);
+          reject(new Error(errorMessage));
+        }
+      });
     });
-  });
+  } catch (error) {
+    logger.error(`Error encoding file ${file}: ${error.message}`);
+    throw error;
+  }
 }
 
 async function encode() {
@@ -100,7 +135,7 @@ async function encode() {
       (file, index) => () => encodeFile(file, index, progress)
     );
 
-    const concurrentTasks = 1;
+    const concurrentTasks = process.env.CONCURRENT_TASKS || 1;
     const runningTasks = new Set();
 
     const runTask = async (task) => {
@@ -121,9 +156,10 @@ async function encode() {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    console.log("🎉 All file conversions completed.");
+    logger.info("All file conversions completed.");
   } catch (err) {
-    console.error("Error processing files:", err);
+    logger.error(`Error processing files: ${err.message}`);
+    process.exit(1);
   }
 }
 
