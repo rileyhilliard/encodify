@@ -1,46 +1,60 @@
 #!/usr/bin/env node
 const util = require("node:util");
 const fs = require("node:fs");
+const path = require("node:path");
 const { spawn } = require("child_process");
-
 const exec = util.promisify(require("node:child_process").exec);
+const winston = require("winston");
 
-function changeDate(root, file) {
-  const movVersion = file.replace(".MP4", ".mov");
-  const originalFile = `${root}/${file}`;
-  const convertedFile = `${root}/${movVersion}`;
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || "info",
+  format: winston.format.json(),
+  defaultMeta: { service: "change-date-service" },
+  transports: [
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
+});
 
-  // Get the original file's creation date
-  const originalDate = fs.statSync(originalFile).birthtime;
-  const formattedDate = originalDate.toISOString();
+if (process.env.NODE_ENV !== "production") {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
+}
 
-  return new Promise((resolve, reject) => {
-    const exiftool = spawn("exiftool", [
-      "-TagsFromFile",
-      originalFile,
-      "-all:all>all:all",
-      "-overwrite_original",
-      `-api`,
-      `QuickTimeUTC`,
-      `-CreateDate=${formattedDate}`,
-      convertedFile,
-    ]);
+async function changeDate(originalFile, file) {
+  try {
+    const originalDate = fs.statSync(originalFile).birthtime;
+    const formattedDate = originalDate.toISOString();
 
-    exiftool.on("close", (code) => {
-      if (code === 0) {
-        console.log(
-          `Metadata copied and 'Media Create Date' set for ${movVersion}`
-        );
-        resolve();
-      } else {
-        reject(
-          new Error(
-            `Failed to copy metadata and set 'Media Create Date' for ${movVersion}`
-          )
-        );
-      }
+    await new Promise((resolve, reject) => {
+      const exiftool = spawn("exiftool", [
+        "-TagsFromFile",
+        originalFile,
+        "-all:all>all:all",
+        "-overwrite_original",
+        `-api`,
+        `QuickTimeUTC`,
+        `-CreateDate=${formattedDate}`,
+        file,
+      ]);
+
+      exiftool.on("close", (code) => {
+        if (code === 0) {
+          logger.info(
+            `Metadata copied and 'Media Create Date' set for ${file}`
+          );
+          resolve();
+        } else {
+          const errorMessage = `Failed to copy metadata and set 'Media Create Date' for ${file}`;
+          logger.error(errorMessage);
+          reject(new Error(errorMessage));
+        }
+      });
     });
-  }).then(() => {
+
     const formattedDate2 = new Date(originalDate).toLocaleString("en-US", {
       month: "2-digit",
       day: "2-digit",
@@ -49,10 +63,16 @@ function changeDate(root, file) {
       minute: "2-digit",
     });
 
-    return exec(
-      `SetFile -d "${formattedDate2}" -m "${formattedDate2}" '${root}/${movVersion}'`
-    );
-  });
+    const setFileCommand =
+      process.platform === "darwin"
+        ? `SetFile -d "${formattedDate2}" -m "${formattedDate2}" "${file}"`
+        : `touch -d "${formattedDate2}" "${file}"`;
+
+    await exec(setFileCommand);
+  } catch (error) {
+    logger.error(`Error changing date for file ${file}: ${error.message}`);
+    throw error;
+  }
 }
 
 module.exports = {

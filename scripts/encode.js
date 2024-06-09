@@ -62,7 +62,7 @@ function encodeFile(file, index, progress) {
     process.on("close", async (code) => {
       if (code === 0) {
         bar.update(1);
-        await changeDate(folder, file);
+        await changeDate(path.join(folder, file), dest);
         resolve();
       } else {
         console.error(`Encoding failed for ${file} with exit code ${code}`);
@@ -73,6 +73,9 @@ function encodeFile(file, index, progress) {
 }
 
 async function encode() {
+  console.warn(
+    "use ffmpeg.js instead of encode.js\n Its slower but does a better compression."
+  );
   try {
     const files = fs.readdirSync(folder);
     const progress = new MultiProgress(process.stderr);
@@ -101,9 +104,7 @@ async function encode() {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    progress.on("done", () => {
-      console.log("All file conversions completed.");
-    });
+    console.log("🎉 All file conversions completed.");
   } catch (err) {
     console.error("Error processing files:", err);
   }

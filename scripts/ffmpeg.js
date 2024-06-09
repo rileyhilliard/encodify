@@ -41,7 +41,9 @@ async function encodeFile(file, index, progress) {
       return;
     }
 
-    const dest = path.join(folder, file.replace("MP4", "mp4"));
+    const lastIndex = file.lastIndexOf(".");
+    const name = file.substring(0, lastIndex);
+    const dest = path.join(folder, `${name}-encoded.mp4`);
 
     if (fs.existsSync(dest)) {
       logger.warn(`Skipping encoding for ${file} as ${dest} already exists.`);
@@ -109,7 +111,8 @@ async function encodeFile(file, index, progress) {
       process.on("close", async (code) => {
         if (code === 0) {
           bar.update(1);
-          await changeDate(folder, file);
+
+          await changeDate(path.join(folder, file), dest);
           resolve();
         } else {
           const errorMessage = `Encoding failed for ${file} with exit code ${code}`;
