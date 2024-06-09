@@ -2,7 +2,7 @@
 const fs = require("fs");
 const path = require("path");
 const { spawn, spawnSync } = require("child_process");
-const { changeDate } = require("./change-date");
+const { changeDate } = require("./helpers");
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 const MultiProgress = require("multi-progress");

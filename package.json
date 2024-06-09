@@ -1,7 +1,7 @@
 {
   "name": "encodify",
   "version": "1.0.0",
-  "description": "Encode video files and preserve original creation dates",
+  "description": "Transcode video files to HVEC/x265 while preserving original metadata and file creation dates",
   "main": "scripts/ffmpeg.js",
   "scripts": {
     "start": "node scripts/ffmpeg.js",
@@ -14,10 +14,12 @@
   },
   "keywords": [
     "video",
-    "encoding",
+    "encode",
+    "transcode",
     "ffmpeg",
     "metadata",
-    "creation-date"
+    "mp4",
+    "hvec"
   ],
   "author": "Riley Hilliard",
   "license": "MIT",
@@ -28,6 +30,7 @@
   "dependencies": {
     "ffprobe": "^1.1.2",
     "multi-progress": "^4.0.0",
+    "progress": "^2.0.3",
     "winston": "^3.13.0",
     "yargs": "^17.7.2"
   },

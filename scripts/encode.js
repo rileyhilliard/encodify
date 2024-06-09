@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const fs = require("fs");
 const { spawn } = require("child_process");
-const { changeDate } = require("./change-date");
+const { changeDate } = require("./helpers");
 const argv = require("yargs/yargs")(process.argv.slice(2)).argv;
 const folder = argv.f;
 const MultiProgress = require("multi-progress");

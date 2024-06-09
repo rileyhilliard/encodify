@@ -2,6 +2,8 @@
 
 This project provides a script to encode all `.MP4` files in a specified folder to HVEC (H.265) format and change the creation date of the encoded files to match the creation date of the original `.MP4` files.
 
+![](https://i.ibb.co/qrJ5fvr/demo.gif)
+
 ## Motivation
 
 Raw video recordings from high-end DSLR cameras, such as Canon, produce huge file sizes. For example, a 10-minute 1080p video can be around 5GB in size. To efficiently store these videos, it becomes important to compress them to avoid using an unnecessary amount of storage space.
@@ -12,7 +14,7 @@ For home videos, preserving the original shoot date is crucial, especially when 
 
 This script solves both these issues by:
 
-1. Compressing the video size by approximately 7 times, significantly reducing storage requirements while balancing quality.
+1. Compressing the video size, significantly reducing storage requirements while balancing quality.
 2. Preserving the video file metadata, including the creation date, ensuring that the videos maintain their correct timeline and organization in platforms like Google Photos.
 
 ## Features

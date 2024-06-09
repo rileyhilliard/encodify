@@ -44,7 +44,7 @@ async function changeDate(originalFile, file) {
       exiftool.on("close", (code) => {
         if (code === 0) {
           logger.info(
-            `Metadata copied and 'Media Create Date' set for ${file}`
+            `\nMetadata copied and 'Media Create Date' set for ${file}`
           );
           resolve();
         } else {

@@ -405,6 +405,7 @@ __metadata:
     eslint: "npm:^9.4.0"
     ffprobe: "npm:^1.1.2"
     multi-progress: "npm:^4.0.0"
+    progress: "npm:^2.0.3"
     winston: "npm:^3.13.0"
     yargs: "npm:^17.7.2"
   languageName: unknown
@@ -954,6 +955,13 @@ __metadata:
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
   checksum: 10c0/b00d617431e7886c520a6f498a2e14c75ec58f6d93ba48c3b639cf241b54232d90daa05d83a9e9b9fef6baa63cb7e1e4602c2372fea5bc169668401eb127d0cd
+  languageName: node
+  linkType: hard
+
+"progress@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "progress@npm:2.0.3"
+  checksum: 10c0/1697e07cb1068055dbe9fe858d242368ff5d2073639e652b75a7eb1f2a1a8d4afd404d719de23c7b48481a6aa0040686310e2dac2f53d776daa2176d3f96369c
   languageName: node
   linkType: hard
 
