@@ -6,11 +6,7 @@ This project provides a script to encode all `.MP4` files in a specified folder 
 
 ## Motivation
 
-Raw video recordings from high-end DSLR cameras, such as Canon, produce huge file sizes. For example, a 10-minute 1080p video can be around 5GB in size. To efficiently store these videos, it becomes important to compress them to avoid using an unnecessary amount of storage space.
-
-However, when transcoding files with typical transcoding scripts or software, the newly created file does not inherit the metadata from the original source file. This means that important information, such as the shoot date of the video, is changed to the day the transcode was performed.
-
-For home videos, preserving the original shoot date is crucial, especially when using platforms like Google Photos to store them. If the shoot date is lost, the video will appear in the wrong place (from a time perspective) in the Google Photos feed, making it difficult to organize and find specific memories.
+Videos shot on high-end cameras like DSLRs create very large files. A 10-minute HD video can be 5GB in size. To save storage space, these videos need to be compressed. However, typical video compression software changes the original creation date to the date the video was compressed. This is a problem for home videos, because the creation date is used to organize them in photo apps like Google Photos. Changing the date means the videos will show up in the wrong order. This project solves the problem by compressing videos to save space while also preserving the original creation date. This keeps transcoded videos properly organized in the correct timeline.
 
 This script solves both these issues by:
 
